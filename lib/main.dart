@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './execution.dart';
+import './task_detail.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,7 +34,7 @@ class TopPage extends StatelessWidget {
           onPressed: () => {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (BuildContext context) => ExecutionPage(),
+                builder: (BuildContext context) => ToDoListDetailPage(),
               ),
             ),
           },
