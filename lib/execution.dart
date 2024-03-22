@@ -3,62 +3,75 @@ import 'dart:ui';
 import 'dart:async';
 
 class ExecutionPage extends StatefulWidget {
-  int maxSeconds = 5;
-  int seconds = 5;
-  Timer? timer;
-  String task = '';
-  List<String> tasks = ['ベッドメイキング', '洗顔', '朝食', '歯磨き'];
   @override
   _ExecutionPageState createState() => _ExecutionPageState();
 }
 
 class _ExecutionPageState extends State<ExecutionPage> {
-  //static const defaultSeconds = 10;
   int maxSeconds = 5;
   int seconds = 5;
-  Timer? timer;
+  Timer? idealTimer;
+  Timer? realTimer;
   String task = '';
   List<String> tasks = ['ベッドメイキング', '洗顔', '朝食', '歯磨き'];
   int count = 0;
   List<Map<String, dynamic>> taskList = [
-    {"name": "ベッドメイク", "idealTime": 4, "realTime": 0},
-    {"name": "洗顔", "idealTime": 5, "realTime": 0},
-    {"name": "朝食", "idealTime": 6, "realTime": 0},
+    {"name": "ベッドメイク", "idealTime": 60, "realTime": 0},
+    {"name": "洗顔", "idealTime": 63, "realTime": 0},
+    {"name": "朝食", "idealTime": 30, "realTime": 0},
     {"name": "歯磨き", "idealTime": 3, "realTime": 0},
   ];
   int realTime = 0;
   TextEditingController timeController = TextEditingController(); // 時間入力
+  int displayMinutes = 0;
+  int displaySeconds = 0;
 
   _ExecutionPageState() {
-    print('$count init');
     task = taskList[count]["name"];
     maxSeconds = taskList[count]["idealTime"];
     seconds = taskList[count]["idealTime"];
+    displayMinutes = taskList[count]["idealTime"] ~/ 60;
+    displaySeconds = (taskList[count]["idealTime"] % 60 == 0)
+        ? 00
+        : taskList[count]["idealTime"] % 60;
+    print('$displayMinutes : $displaySeconds init');
   }
 
   void startTimer({bool reset = true}) {
     print(task + 'をスタート');
     if (reset) {
-      resetTimer();
+      resetRealTimer();
+      resetIdealTimer();
     }
-    // seconds: 1
-    timer = Timer.periodic(Duration(seconds: 1), (_) {
+
+    idealTimer = Timer.periodic(Duration(seconds: 1), (_) {
       if (seconds > 0) {
         setState(() => seconds--);
+        setState(() => displayMinutes = seconds ~/ 60);
+        setState(() => displaySeconds = seconds % 60);
       } else {
         stopTimer(reset: false);
         // seconds = maxSeconds;
       }
     });
+
+    realTimer = Timer.periodic(Duration(seconds: 1), (_) {
+      realTime++;
+      // setState(() => realTime--);
+    });
   }
 
-  void resetTimer() => setState(() => seconds = maxSeconds);
+  void resetRealTimer() => setState(() => seconds = maxSeconds);
+
+  void resetIdealTimer() {
+    realTime = 0;
+  }
 
   void stopTimer({bool reset = true}) {
     if (reset) {
-      resetTimer();
+      resetRealTimer();
     }
-    setState(() => timer?.cancel());
+    setState(() => idealTimer?.cancel());
   }
 
   void setPrams() {
@@ -68,23 +81,35 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   void nextTask() {
+    print(realTimer?.tick);
+    taskList[count]["realTime"] = realTimer?.tick;
+    realTimer?.cancel();
+    idealTimer?.cancel();
+    print(taskList);
+    print(realTimer?.tick);
+
     count = count + 1;
     if (count == tasks.length) {
       count = 0;
     }
     setPrams();
     // task = tasks[count];
-    resetTimer();
-    if(count == 0){
+    resetRealTimer();
+    if (count == 0) {
       Navigator.pushReplacement(
-        context, 
-        MaterialPageRoute(builder: (context) => NextScreen(
-          tasks: tasks,
-          taskList: taskList,
-        )),
-        );
+        context,
+        MaterialPageRoute(
+            builder: (context) => NextScreen(
+                  tasks: tasks,
+                  taskList: taskList,
+                )),
+      );
     }
+    // resetRealTimer();
+    // resetIdealTimer();
+    startTimer();
   }
+
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
@@ -103,7 +128,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
           )));
 
   Widget buildButtons() {
-    final isRunning = timer == null ? false : timer!.isActive;
+    final isRunning = idealTimer == null ? false : idealTimer!.isActive;
     final isCompleted = seconds == 0;
     // final timeController = TextEditingController();
 
@@ -121,7 +146,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
       ButtonWidget(
           text: '初めから',
           onClicked: () {
-            resetTimer();
+            resetRealTimer();
           }),
       const SizedBox(width: 12),
       ButtonWidget(
@@ -135,16 +160,17 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   Widget buildTimer() => SizedBox(
-      width: 200,
-      height: 200,
+      width: 400,
+      height: 400,
       child: Stack(
         fit: StackFit.expand,
         children: [
           CircularProgressIndicator(
             value: 1 - seconds / maxSeconds,
             valueColor: AlwaysStoppedAnimation(Colors.white),
-            strokeWidth: 12,
-            backgroundColor: Colors.greenAccent,
+            strokeWidth: 14,
+            backgroundColor:
+                seconds > 2 ? Colors.greenAccent : Colors.redAccent,
           ),
           Center(
             child: buildTime(),
@@ -153,11 +179,10 @@ class _ExecutionPageState extends State<ExecutionPage> {
       ));
 
   Widget buildTime() {
-    return Text('$seconds',
+    return Text('$displayMinutes分 $displaySeconds秒',
         style: const TextStyle(
-            fontWeight: FontWeight.bold, color: Colors.white, fontSize: 80));
+            fontWeight: FontWeight.bold, color: Colors.white, fontSize: 60));
   }
-  
 }
 
 class ButtonWidget extends StatelessWidget {
@@ -184,15 +209,15 @@ class ButtonWidget extends StatelessWidget {
       );
 }
 
-  class NextScreen extends StatelessWidget {
-    final List<String> tasks;
-    final List<Map<String, dynamic>> taskList;
+class NextScreen extends StatelessWidget {
+  final List<String> tasks;
+  final List<Map<String, dynamic>> taskList;
 
-    NextScreen({
-      required this.tasks,
-      required this.taskList,
-    });
- 
+  NextScreen({
+    required this.tasks,
+    required this.taskList,
+  });
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
@@ -227,14 +252,13 @@ class ButtonWidget extends StatelessWidget {
                           children: [
                             Text(
                               '${tasks[i]} 結果：${_formatTime(taskList[i]["idealTime"])} ：00 / ',
-                            style: TextStyle(fontSize: 16),
+                              style: TextStyle(fontSize: 16),
                             ),
-                               SizedBox(width: 10),
-                               DropdownButton<int>(
-                                value: taskList[0]["idealTime"],
-                                onChanged: (value){
-                                },
-                                items: _buildDropdownItems(),
+                            SizedBox(width: 10),
+                            DropdownButton<int>(
+                              value: taskList[0]["idealTime"],
+                              onChanged: (value) {},
+                              items: _buildDropdownItems(),
                             ),
                           ],
                         ),
@@ -247,18 +271,18 @@ class ButtonWidget extends StatelessWidget {
           ),
         ),
       );
-    String _formatTime(int seconds) {
+  String _formatTime(int seconds) {
     int minutes = seconds ~/ 60;
-    return minutes.toString().padLeft(2, '0'); 
+    return minutes.toString().padLeft(2, '0');
   }
-    List<DropdownMenuItem<int>> _buildDropdownItems() {
-      return List.generate(
-        60,
-        (index) => DropdownMenuItem<int>(
-          value: index,
-          child: Text('$index ：00'),
-        ),
-      );
+
+  List<DropdownMenuItem<int>> _buildDropdownItems() {
+    return List.generate(
+      60,
+      (index) => DropdownMenuItem<int>(
+        value: index,
+        child: Text('$index ：00'),
+      ),
+    );
   }
-  
 }
