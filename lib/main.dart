@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'task_selection_screen.dart';
 import 'task.dart';
 import 'executive_function.dart'; // executive_function.dart をインポート
+import 'task_detail.dart';
 
 void main() {
   runApp(const MyApp());
@@ -85,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const TopPage()),
+                      MaterialPageRoute(builder: (context) => ToDoListDetailPage()),
                     );
                   },
                   child: const Text('実行画面'),
