@@ -25,7 +25,7 @@ class TopPage extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: ElevatedButton(
-          child: const Text('実行画面'),
+          child: const Text('Start'),
           onPressed: () => {
             Navigator.of(context).push(
               MaterialPageRoute(
