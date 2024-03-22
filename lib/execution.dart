@@ -280,8 +280,8 @@ class NextScreen extends StatelessWidget {
     return List.generate(
       60,
       (index) => DropdownMenuItem<int>(
-        value: index,
-        child: Text('$index ：00'),
+        value: index + 1,
+        child: Text('${index + 1} ：00'),
       ),
     );
   }
