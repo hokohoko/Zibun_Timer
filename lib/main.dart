@@ -86,7 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ToDoListDetailPage()),
+                      MaterialPageRoute(
+                          builder: (context) => ToDoListDetailPage()),
                     );
                   },
                   child: const Text('実行画面'),

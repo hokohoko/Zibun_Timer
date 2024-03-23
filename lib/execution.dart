@@ -18,9 +18,9 @@ class _ExecutionPageState extends State<ExecutionPage> {
   int count = 0;
   List<Map<String, dynamic>> taskList = [
     {"name": "ベッドメイク", "idealTime": 60, "realTime": 0},
-    {"name": "洗顔", "idealTime": 63, "realTime": 0},
-    {"name": "朝食", "idealTime": 30, "realTime": 0},
-    {"name": "歯磨き", "idealTime": 3, "realTime": 0},
+    {"name": "洗顔", "idealTime": 600, "realTime": 0},
+    {"name": "朝食", "idealTime": 1200, "realTime": 0},
+    {"name": "歯磨き", "idealTime": 300, "realTime": 0},
   ];
   int realTime = 0;
   TextEditingController timeController = TextEditingController(); // 時間入力
@@ -40,10 +40,10 @@ class _ExecutionPageState extends State<ExecutionPage> {
 
   @override
   void dispose() {
-  idealTimer?.cancel(); // タイマーをキャンセルしてメモリリークを回避
-  realTimer?.cancel(); // タイマーをキャンセルしてメモリリークを回避
-  super.dispose();
-}
+    idealTimer?.cancel(); // タイマーをキャンセルしてメモリリークを回避
+    realTimer?.cancel(); // タイマーをキャンセルしてメモリリークを回避
+    super.dispose();
+  }
 
   void startTimer({bool reset = true}) {
     print(task + 'をスタート');
@@ -98,16 +98,16 @@ class _ExecutionPageState extends State<ExecutionPage> {
 
     count = count + 1;
     if (count == tasks.length) {
-        count = 0;
-        // dispose();
-        ResultPage.ResultPage resultPage = ResultPage.ResultPage(taskList: taskList);
-        Navigator.pushReplacement(
+      count = 0;
+      // dispose();
+      ResultPage.ResultPage resultPage =
+          ResultPage.ResultPage(taskList: taskList);
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => resultPage,
         ),
       );
-
     }
     setPrams();
     // task = tasks[count];
@@ -124,7 +124,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
       ),
       body: Container(
           width: double.infinity,
-          color: Colors.lightBlue.shade100,
+          color: Colors.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -140,22 +140,22 @@ class _ExecutionPageState extends State<ExecutionPage> {
     // final timeController = TextEditingController();
 
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      ButtonWidget(
-          text: isRunning ? '停止' : '再開',
-          onClicked: () {
-            if (isRunning) {
-              stopTimer(reset: false);
-            } else {
-              startTimer(reset: false);
-            }
-          }),
-      const SizedBox(width: 12),
-      ButtonWidget(
-          text: '初めから',
-          onClicked: () {
-            resetRealTimer();
-          }),
-      const SizedBox(width: 12),
+      // ButtonWidget(
+      //     text: isRunning ? '停止' : '再開',
+      //     onClicked: () {
+      //       if (isRunning) {
+      //         stopTimer(reset: false);
+      //       } else {
+      //         startTimer(reset: false);
+      //       }
+      //     }),
+      // const SizedBox(width: 12),
+      // ButtonWidget(
+      //     text: '初めから',
+      //     onClicked: () {
+      //       resetRealTimer();
+      //     }),
+      // const SizedBox(width: 12),
       ButtonWidget(
         text: isRunning || isCompleted ? '完了' : 'スタート',
         onClicked: () {
@@ -174,10 +174,10 @@ class _ExecutionPageState extends State<ExecutionPage> {
         children: [
           CircularProgressIndicator(
             value: 1 - seconds / maxSeconds,
-            valueColor: AlwaysStoppedAnimation(Colors.white),
+            valueColor: AlwaysStoppedAnimation(Colors.grey.shade400),
             strokeWidth: 14,
             backgroundColor:
-                seconds > 2 ? Colors.greenAccent : Colors.redAccent,
+                seconds > 2 ? Colors.blue.shade400 : Colors.redAccent,
           ),
           Center(
             child: buildTime(),
@@ -188,7 +188,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
   Widget buildTime() {
     return Text('$displayMinutes分 $displaySeconds秒',
         style: const TextStyle(
-            fontWeight: FontWeight.bold, color: Colors.white, fontSize: 60));
+            fontWeight: FontWeight.bold, color: Colors.black, fontSize: 60));
   }
 }
 

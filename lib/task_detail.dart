@@ -5,49 +5,45 @@ class ToDoListDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('タスク詳細')
-      ),
-      body: Column(
-        children: <Widget>[
-          Card(
-            child: ListTile(
-              title: Text('ベッドメイキング 1分'),
-            ),
+      appBar: AppBar(title: Text('タスク詳細')),
+      body: Column(children: <Widget>[
+        Card(
+          child: ListTile(
+            title: Text('ベッドメイキング 1分'),
           ),
-          Card(
-            child: ListTile(
-              title: Text('洗顔 10分'),
-            ),
+        ),
+        Card(
+          child: ListTile(
+            title: Text('洗顔 10分'),
           ),
-          Card(
-            child: ListTile(
-              title: Text('朝食 20分'),
-            ),
+        ),
+        Card(
+          child: ListTile(
+            title: Text('朝食 20分'),
           ),
-          Card(
-            child: ListTile(
-              title: Text('歯磨き 5分'),
-            ),
+        ),
+        Card(
+          child: ListTile(
+            title: Text('歯磨き 5分'),
           ),
-          ButtonWidget(
-            text: 'スタート',
-            onClicked: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => ExecutionPage(),
-                ),
-              );
-            },
-          ),
-        ]
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          //nothing
-        },
-        child: Icon(Icons.add)
-      )
+        ),
+        ButtonWidget(
+          text: 'スタート',
+          onClicked: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context) => ExecutionPage(),
+              ),
+            );
+          },
+        ),
+      ]),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     //nothing
+      //   },
+      //   child: Icon(Icons.add)
+      // )
     );
   }
 }
