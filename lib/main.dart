@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'タスク選択アプリ',
+      title: 'ZIBUN_TIMER',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
