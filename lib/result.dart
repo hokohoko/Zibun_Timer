@@ -16,65 +16,72 @@ class _ResultPageState extends State<ResultPage> {
   @override
   void initState() {
     super.initState();
-    _selectedTimes = List.generate(widget.taskList.length, (index) => _formatTime(widget.taskList[index]["idealTime"]));
+    _selectedTimes = List.generate(widget.taskList.length,
+        (index) => _formatTime(widget.taskList[index]["idealTime"]));
     _selectedIndexes = List.generate(widget.taskList.length, (index) => 0);
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: Text(
-        '朝のルーティン　結果画面',
-        style: TextStyle(fontSize: 20),
-      ),
-    ),
-    body: Container(
-      width: double.infinity,
-      color: Colors.lightBlue.shade100,
-      child: ListView.builder(
-        itemCount: widget.taskList.length,
-        itemBuilder: (context, index) {
-          bool isOnSchedule = widget.taskList[index]["realTime"] <= widget.taskList[index]["idealTime"];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        appBar: AppBar(
+          title: Text(
+            '朝のルーティン　結果画面',
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
+        body: Container(
+          width: double.infinity,
+          color: Colors.white,
+          child: ListView.builder(
+            itemCount: widget.taskList.length,
+            itemBuilder: (context, index) {
+              bool isOnSchedule = widget.taskList[index]["realTime"] <=
+                  widget.taskList[index]["idealTime"];
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'タスク名: ${widget.taskList[index]["name"]}',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isOnSchedule ? Colors.red : Colors.black),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${widget.taskList[index]["name"]}',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isOnSchedule ? Colors.blue : Colors.red),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '経過時間: ${_formatTime(widget.taskList[index]["realTime"])}',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        SizedBox(width: 8),
+                        DropdownButton<String>(
+                          value: _selectedTimes[index],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedTimes[index] = value!;
+                              _selectedIndexes[index] = _buildDropdownItems()
+                                  .indexWhere((item) => item.value == value);
+                            });
+                            int seconds = int.parse(value!.split(':')[0]) * 60 +
+                                int.parse(value.split(':')[1]);
+                          },
+                          items: _buildDropdownItems(),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      '経過時間: ${_formatTime(widget.taskList[index]["realTime"])}',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    SizedBox(width: 8),
-                    DropdownButton<String>(
-                      value: _selectedTimes[index],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedTimes[index] = value!;
-                          _selectedIndexes[index] =
-                          _buildDropdownItems().indexWhere((item) => item.value == value);
-                        });
-                        int seconds = int.parse(value!.split(':')[0]) * 60 + int.parse(value.split(':')[1]);
-                      },
-                      items: _buildDropdownItems(),
-                    ),
+                    Divider(),
                   ],
                 ),
-                Divider(), 
-              ],
-            ),
-          );
-        },
-      ),
-    ),
-  );
+              );
+            },
+          ),
+        ),
+      );
 
   String _formatTime(int seconds) {
     int minutes = seconds ~/ 60;
@@ -87,7 +94,7 @@ class _ResultPageState extends State<ResultPage> {
   List<DropdownMenuItem<String>> _buildDropdownItems() {
     return List.generate(
       24 * 60,
-          (index) {
+      (index) {
         int hour = index ~/ 60;
         int minute = index % 60;
         String formattedHour = hour.toString().padLeft(2, '0');
