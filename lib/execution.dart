@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/result.dart' as ResultPage;
 import 'dart:ui';
 import 'dart:async';
 
@@ -36,6 +37,13 @@ class _ExecutionPageState extends State<ExecutionPage> {
         : taskList[count]["idealTime"] % 60;
     print('$displayMinutes : $displaySeconds init');
   }
+
+  @override
+  void dispose() {
+  idealTimer?.cancel(); // タイマーをキャンセルしてメモリリークを回避
+  realTimer?.cancel(); // タイマーをキャンセルしてメモリリークを回避
+  super.dispose();
+}
 
   void startTimer({bool reset = true}) {
     print(task + 'をスタート');
@@ -90,21 +98,20 @@ class _ExecutionPageState extends State<ExecutionPage> {
 
     count = count + 1;
     if (count == tasks.length) {
-      count = 0;
+        count = 0;
+        // dispose();
+        ResultPage.ResultPage resultPage = ResultPage.ResultPage(taskList: taskList);
+        Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => resultPage,
+        ),
+      );
+
     }
     setPrams();
     // task = tasks[count];
     resetRealTimer();
-    if (count == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => NextScreen(
-                  tasks: tasks,
-                  taskList: taskList,
-                )),
-      );
-    }
     // resetRealTimer();
     // resetIdealTimer();
     startTimer();
@@ -207,82 +214,4 @@ class ButtonWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16)),
         child: Text(text, style: TextStyle(fontSize: 20, color: color)),
       );
-}
-
-class NextScreen extends StatelessWidget {
-  final List<String> tasks;
-  final List<Map<String, dynamic>> taskList;
-
-  NextScreen({
-    required this.tasks,
-    required this.taskList,
-  });
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('朝のルーティン'),
-        ),
-        body: Container(
-          width: double.infinity,
-          color: Colors.lightBlue.shade100,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('結果'),
-                    Text('朝のルーティン'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 80),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    for (int i = 0; i < tasks.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '${tasks[i]} 結果：${_formatTime(taskList[i]["idealTime"])} ：00 / ',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            SizedBox(width: 10),
-                            DropdownButton<int>(
-                              value: taskList[0]["idealTime"],
-                              onChanged: (value) {},
-                              items: _buildDropdownItems(),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 80),
-            ],
-          ),
-        ),
-      );
-  String _formatTime(int seconds) {
-    int minutes = seconds ~/ 60;
-    return minutes.toString().padLeft(2, '0');
-  }
-
-  List<DropdownMenuItem<int>> _buildDropdownItems() {
-    return List.generate(
-      60,
-      (index) => DropdownMenuItem<int>(
-        value: index + 1,
-        child: Text('${index + 1} ：00'),
-      ),
-    );
-  }
 }
